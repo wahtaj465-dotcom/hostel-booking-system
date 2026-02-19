@@ -16,12 +16,12 @@ exports.bookRoom = async (req, res) => {
     // 🔐 userId from JWT middleware
     const userId = req.userId;
 
-    // 1️⃣ Reduce bed via hostel-service
+    // 1️⃣ Reduce bed via hostel-service (DOCKER FIX)
     await axios.patch(
-      `http://localhost:4002/hostels/${roomId}/reduce-bed`
+      `${process.env.HOSTEL_SERVICE_URL}/hostels/${roomId}/reduce-bed`
     );
 
-    // 2️⃣ Save booking
+    // 2️⃣ Save booking in booking DB
     const booking = await Booking.create({
       userId,
       roomId,

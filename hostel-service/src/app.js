@@ -13,7 +13,8 @@ app.use(express.json());
 
 app.use("/hostels", require("./routes/hostel.routes"));
 
-const PORT = 4002;
+const PORT = process.env.PORT || 4002;
+
 
 app.listen(PORT, () => {
   console.log(`Hostel Service running on port ${PORT}`);
