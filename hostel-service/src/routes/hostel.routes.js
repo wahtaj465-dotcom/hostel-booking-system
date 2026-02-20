@@ -1,17 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const hostelController = require("../controllers/hostel.controller");
+const {
+  createRoom,
+  getRooms,
+  reduceBed,
+  increaseBed,
+} = require("../controllers/hostel.controller");
 
-// Add Room
-router.post("/add-room", hostelController.addRoom);
-
-// Get All Rooms
-router.get("/", hostelController.getRooms);
-
-// Get Room By ID
-router.get("/:id", hostelController.getRoomById);
-
-// Reduce Available Bed
-router.patch("/:id/reduce-bed", hostelController.reduceBed);
+router.post("/", createRoom);
+router.get("/", getRooms);
+router.patch("/:id/reduce-bed", reduceBed);
+router.patch("/:id/increase-bed", increaseBed);
 
 module.exports = router;

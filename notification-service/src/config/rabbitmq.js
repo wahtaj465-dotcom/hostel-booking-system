@@ -3,15 +3,22 @@ const amqp = require("amqplib");
 let channel;
 
 const connectRabbitMQ = async () => {
-  try {
-    const connection = await amqp.connect(process.env.RABBITMQ_URL);
-    channel = await connection.createChannel();
+  const RABBITMQ_URL = process.env.RABBITMQ_URL;
 
-    console.log("✅ RabbitMQ Connected (Notification Service)");
+  while (true) {
+    try {
+      console.log("Connecting to RabbitMQ...");
 
-    return channel;
-  } catch (error) {
-    console.error("❌ RabbitMQ connection failed:", error);
+      const connection = await amqp.connect(RABBITMQ_URL);
+      channel = await connection.createChannel();
+
+      console.log("✅ RabbitMQ Connected (Notification Service)");
+      break;
+
+    } catch (error) {
+      console.error("❌ RabbitMQ not ready, retrying in 5 seconds...");
+      await new Promise(resolve => setTimeout(resolve, 5000));
+    }
   }
 };
 
