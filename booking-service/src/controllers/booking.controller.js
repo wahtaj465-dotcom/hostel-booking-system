@@ -3,34 +3,40 @@ const Booking = require("../models/booking.model");
 const { publishBookingEvent } = require("../events/producer");
 const { BOOKING_CREATED } = require("../events/topics");
 
-// Book Room (Concurrency Safe)
+// ==========================================
+// 📌 BOOK ROOM (Concurrency Safe + Event)
+// ==========================================
 exports.bookRoom = async (req, res) => {
   try {
     const { roomId } = req.body;
 
     if (!roomId) {
-      return res.status(400).json({ message: "roomId is required" });
+      return res.status(400).json({
+        message: "roomId is required",
+      });
     }
 
     const userId = req.userId;
 
-    // 1️⃣ Atomic bed reduction
+    // 1️⃣ Atomic bed reduction via Hostel Service
     const response = await axios.patch(
       `${process.env.HOSTEL_SERVICE_URL}/hostels/${roomId}/reduce-bed`
     );
 
     if (!response || response.status !== 200) {
-      return res.status(400).json({ message: "Room not available" });
+      return res.status(400).json({
+        message: "Room not available",
+      });
     }
 
-    // 2️⃣ Save booking
+    // 2️⃣ Save booking in DB
     const booking = await Booking.create({
       userId,
       roomId,
       status: "CONFIRMED",
     });
 
-    // 3️⃣ Publish event
+    // 3️⃣ Publish booking created event
     await publishBookingEvent({
       type: BOOKING_CREATED,
       bookingId: booking._id,
@@ -38,25 +44,30 @@ exports.bookRoom = async (req, res) => {
       roomId,
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Room booked successfully",
       booking,
     });
 
   } catch (error) {
     console.error("Booking Error:", error.message);
-    res.status(400).json({
-      message: error.response?.data?.message || "Booking failed",
+
+    return res.status(400).json({
+      message:
+        error.response?.data?.message || "Booking failed",
     });
   }
 };
 
-// Cancel Booking
+// ==========================================
+// ❌ CANCEL BOOKING (Event Driven)
+// ==========================================
 exports.cancelBooking = async (req, res) => {
   try {
     const bookingId = req.params.id;
     const userId = req.userId;
 
+    // 1️⃣ Find confirmed booking
     const booking = await Booking.findOne({
       _id: bookingId,
       userId,
@@ -64,19 +75,16 @@ exports.cancelBooking = async (req, res) => {
     });
 
     if (!booking) {
-      return res.status(404).json({ message: "Booking not found" });
+      return res.status(404).json({
+        message: "Booking not found or already cancelled",
+      });
     }
 
-    // 1️⃣ Increase bed
-    await axios.patch(
-      `${process.env.HOSTEL_SERVICE_URL}/hostels/${booking.roomId}/increase-bed`
-    );
-
-    // 2️⃣ Update status
+    // 2️⃣ Update booking status
     booking.status = "CANCELLED";
     await booking.save();
 
-    // 3️⃣ Publish event
+    // 3️⃣ Publish cancellation event
     await publishBookingEvent({
       type: "BOOKING_CANCELLED",
       bookingId: booking._id,
@@ -84,13 +92,16 @@ exports.cancelBooking = async (req, res) => {
       roomId: booking.roomId,
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Booking cancelled successfully",
       booking,
     });
 
   } catch (error) {
     console.error("Cancel Error:", error.message);
-    res.status(400).json({ message: "Cancellation failed" });
+
+    return res.status(400).json({
+      message: "Cancellation failed",
+    });
   }
 };

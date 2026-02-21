@@ -13,17 +13,23 @@ const startBookingConsumer = async () => {
   console.log("👂 Waiting for booking messages...");
 
   channel.consume(QUEUE_NAME, async (msg) => {
-    if (msg) {
-      const bookingData = JSON.parse(msg.content.toString());
+    if (!msg) return;
 
-      console.log("📩 Booking event received:", bookingData);
+    const bookingData = JSON.parse(msg.content.toString());
 
+    console.log("📩 Event received:", bookingData);
+
+    if (bookingData.type === "BOOKING_CREATED") {
+      console.log("📧 Sending booking confirmation email...");
       await sendEmail(bookingData);
-
-      console.log("✅ Email simulation complete");
-
-      channel.ack(msg);
     }
+
+    if (bookingData.type === "BOOKING_CANCELLED") {
+      console.log("📧 Sending cancellation email...");
+      await sendEmail(bookingData);
+    }
+
+    channel.ack(msg);
   });
 };
 

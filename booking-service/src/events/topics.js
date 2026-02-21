@@ -9,6 +9,7 @@ const QUEUES = {
 
 const EVENTS = {
   BOOKING_CREATED: "BOOKING_CREATED",
+  BOOKING_CANCELLED: "BOOKING_CANCELLED",
 };
 
 module.exports = {
