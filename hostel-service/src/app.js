@@ -3,10 +3,12 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const { startBookingConsumer } = require("./events/booking.consumer");
-
+const { connectRedis } = require("./cache/redis.client");
 
 dotenv.config();
 connectDB();
+connectRedis();
+startBookingConsumer();
 
 const app = express();
 
