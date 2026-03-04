@@ -1,14 +1,20 @@
 const { getChannel } = require("../config/rabbitmq");
 const { sendEmail } = require("../services/email.service");
 
-const QUEUE_NAME = "booking_queue";
+const EXCHANGE_NAME = "booking_events";
+const QUEUE_NAME = "notification_booking_queue";  // ← its own queue
 
 const startBookingConsumer = async () => {
   const channel = getChannel();
 
-  await channel.assertQueue(QUEUE_NAME, {
-    durable: true,
-  });
+  // Assert the fanout exchange
+  await channel.assertExchange(EXCHANGE_NAME, "fanout", { durable: true });
+
+  // Create this service's own queue
+  await channel.assertQueue(QUEUE_NAME, { durable: true });
+
+  // Bind our queue to the exchange
+  await channel.bindQueue(QUEUE_NAME, EXCHANGE_NAME, "");
 
   console.log("👂 Waiting for booking messages...");
 
