@@ -41,7 +41,19 @@ exports.getRooms = async (req, res) => {
     });
 
     res.json(rooms);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
+// ==========================================
+// ✅ GET ROOM BY ID
+// ==========================================
+exports.getRoomById = async (req, res) => {
+  try {
+    const room = await Room.findById(req.params.id);
+    if (!room) return res.status(404).json({ message: "Room not found" });
+    res.json(room);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -68,7 +80,6 @@ exports.reduceBed = async (req, res) => {
     await redis.del("all_rooms");
 
     return res.status(200).json({ message: "Bed reduced successfully" });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -95,7 +106,6 @@ exports.increaseBed = async (req, res) => {
     await redis.del("all_rooms");
 
     return res.status(200).json({ message: "Bed increased successfully" });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

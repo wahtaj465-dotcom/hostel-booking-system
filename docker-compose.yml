@@ -88,8 +88,12 @@ services:
       - "4004:4004"
     environment:
       PORT: 4004
+      MONGO_URI: mongodb://mongo:27017/notification-service-db
       RABBITMQ_URL: amqp://rabbitmq:5672
+      JWT_SECRET: secretkey
     depends_on:
+      mongo:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
 
@@ -97,10 +101,16 @@ services:
     build: ./api-gateway
     ports:
       - "4000:4000"
+    environment:
+      USER_SERVICE_URL: http://user-service:4001
+      HOSTEL_SERVICE_URL: http://hostel-service:4002
+      BOOKING_SERVICE_URL: http://booking-service:4003
+      NOTIFICATION_SERVICE_URL: http://notification-service:4004
     depends_on:
       - user-service
       - hostel-service
       - booking-service
+      - notification-service
 
 volumes:
   mongo-data:

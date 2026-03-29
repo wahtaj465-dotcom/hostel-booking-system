@@ -14,21 +14,19 @@ exports.register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({
+    await User.create({
       name,
       email,
-      password: hashedPassword
+      password: hashedPassword,
     });
 
     res.status(201).json({
-      message: "User registered successfully"
+      message: "User registered successfully",
     });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 // 🔹 Login
 exports.login = async (req, res) => {
@@ -47,16 +45,20 @@ exports.login = async (req, res) => {
 
     const token = jwt.sign(
       { userId: user._id },
-      "secretkey",     // later move to .env
+      "secretkey", // later move to .env
       { expiresIn: "1d" }
     );
 
     res.json({
       message: "Login successful",
-      token
+      token,
     });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+};
+
+// 🔹 Get Current User (requires verifyToken middleware)
+exports.getMe = async (req, res) => {
+  res.json({ user: req.user });
 };

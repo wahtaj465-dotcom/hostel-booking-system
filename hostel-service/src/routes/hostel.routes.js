@@ -3,12 +3,14 @@ const router = express.Router();
 const {
   createRoom,
   getRooms,
+  getRoomById,
   reduceBed,
   increaseBed,
 } = require("../controllers/hostel.controller");
 
 router.post("/", createRoom);
 router.get("/", getRooms);
+router.get("/:id", getRoomById);
 router.patch("/:id/reduce-bed", reduceBed);
 router.patch("/:id/increase-bed", increaseBed);
 

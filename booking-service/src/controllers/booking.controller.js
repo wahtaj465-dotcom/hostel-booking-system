@@ -48,13 +48,11 @@ exports.bookRoom = async (req, res) => {
       message: "Room booked successfully",
       booking,
     });
-
   } catch (error) {
     console.error("Booking Error:", error.message);
 
     return res.status(400).json({
-      message:
-        error.response?.data?.message || "Booking failed",
+      message: error.response?.data?.message || "Booking failed",
     });
   }
 };
@@ -96,12 +94,24 @@ exports.cancelBooking = async (req, res) => {
       message: "Booking cancelled successfully",
       booking,
     });
-
   } catch (error) {
     console.error("Cancel Error:", error.message);
 
     return res.status(400).json({
       message: "Cancellation failed",
     });
+  }
+};
+
+// ==========================================
+// ✅ GET MY BOOKINGS
+// ==========================================
+exports.getMyBookings = async (req, res) => {
+  try {
+    const userId = req.userId; // same style as other handlers
+    const bookings = await Booking.find({ userId }).sort({ createdAt: -1 });
+    return res.json(bookings);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
 };

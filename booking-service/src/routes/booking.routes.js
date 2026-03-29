@@ -4,6 +4,7 @@ const bookingController = require("../controllers/booking.controller");
 const { verifyToken } = require("../middlewares/auth.middleware");
 
 router.post("/book-room", verifyToken, bookingController.bookRoom);
+router.get("/", verifyToken, bookingController.getMyBookings);
 router.delete("/:id", verifyToken, bookingController.cancelBooking);
 
 module.exports = router;
