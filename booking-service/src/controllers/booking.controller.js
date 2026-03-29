@@ -1,7 +1,7 @@
 const axios = require("axios");
 const Booking = require("../models/booking.model");
 const { publishBookingEvent } = require("../events/producer");
-const { BOOKING_CREATED } = require("../events/topics");
+const { BOOKING_CREATED, BOOKING_CANCELLED } = require("../events/topics");
 
 // ==========================================
 // 📌 BOOK ROOM (Concurrency Safe + Event)
@@ -11,12 +11,13 @@ exports.bookRoom = async (req, res) => {
     const { roomId } = req.body;
 
     if (!roomId) {
-      return res.status(400).json({
-        message: "roomId is required",
-      });
+      return res.status(400).json({ message: "roomId is required" });
     }
 
     const userId = req.userId;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: user not found in token" });
+    }
 
     // 1️⃣ Atomic bed reduction via Hostel Service
     const response = await axios.patch(
@@ -24,9 +25,7 @@ exports.bookRoom = async (req, res) => {
     );
 
     if (!response || response.status !== 200) {
-      return res.status(400).json({
-        message: "Room not available",
-      });
+      return res.status(400).json({ message: "Room not available" });
     }
 
     // 2️⃣ Save booking in DB
@@ -65,6 +64,10 @@ exports.cancelBooking = async (req, res) => {
     const bookingId = req.params.id;
     const userId = req.userId;
 
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: user not found in token" });
+    }
+
     // 1️⃣ Find confirmed booking
     const booking = await Booking.findOne({
       _id: bookingId,
@@ -84,7 +87,7 @@ exports.cancelBooking = async (req, res) => {
 
     // 3️⃣ Publish cancellation event
     await publishBookingEvent({
-      type: "BOOKING_CANCELLED",
+      type: BOOKING_CANCELLED,
       bookingId: booking._id,
       userId,
       roomId: booking.roomId,
@@ -108,7 +111,10 @@ exports.cancelBooking = async (req, res) => {
 // ==========================================
 exports.getMyBookings = async (req, res) => {
   try {
-    const userId = req.userId; // same style as other handlers
+    const userId = req.userId;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: user not found in token" });
+    }
     const bookings = await Booking.find({ userId }).sort({ createdAt: -1 });
     return res.json(bookings);
   } catch (error) {

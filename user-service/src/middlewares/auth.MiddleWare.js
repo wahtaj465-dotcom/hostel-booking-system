@@ -1,3 +1,5 @@
+// user-service/src/middlewares/authMiddleWare.js
+
 const jwt = require("jsonwebtoken");
 
 module.exports = (req, res, next) => {

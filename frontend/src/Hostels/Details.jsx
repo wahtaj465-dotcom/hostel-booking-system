@@ -11,9 +11,30 @@ export default function HostelDetails() {
     getRoom(id).then((res) => setRoom(res.data));
   }, [id]);
 
+  const token = localStorage.getItem('token');
+
   const handleBook = async () => {
-    await bookRoom({ roomId: id });
-    alert("Booking successful!");
+    if (!token) {
+      alert("Please log in before booking a room!");
+      // Optionally: window.location.href = "/login";
+      return;
+    }
+    try {
+      await bookRoom({ roomId: id });
+      alert("Booking successful!");
+      // Refresh room data
+      const res = await getRoom(id);
+      setRoom(res.data);
+    } catch (err) {
+      if (err.response && err.response.status === 401) {
+        alert("Not authorized. Please log in again.");
+        // Optionally: window.location.href = "/login";
+      } else if (err.response && err.response.data && err.response.data.message) {
+        alert("Booking failed: " + err.response.data.message);
+      } else {
+        alert("Booking failed: " + err.message);
+      }
+    }
   };
 
   const handleReduce = async () => {
@@ -44,9 +65,21 @@ export default function HostelDetails() {
       </p>
 
       <div className="mt-6 flex gap-3">
-        <button onClick={handleBook} className="px-5 py-2 bg-[var(--accent)] text-black rounded-xl">
-          Book Now
-        </button>
+        {token ? (
+          <button
+            onClick={handleBook}
+            className="px-5 py-2 bg-[var(--accent)] text-black rounded-xl"
+          >
+            Book Now
+          </button>
+        ) : (
+          <button
+            className="px-5 py-2 bg-[var(--accent)] text-black rounded-xl opacity-50 cursor-not-allowed"
+            disabled
+          >
+            Please log in to book
+          </button>
+        )}
         <button onClick={handleReduce} className="px-5 py-2 bg-[var(--primary)] text-white rounded-xl">
           Reduce Bed
         </button>
