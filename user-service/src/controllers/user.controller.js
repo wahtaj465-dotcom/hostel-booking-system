@@ -2,33 +2,27 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 
-// 🔹 Register
+// REGISTER
 exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+    const exists = await User.findOne({ email });
+    if (exists) {
+      return res.status(400).json({ message: "User exists" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashed = await bcrypt.hash(password, 10);
 
-    await User.create({
-      name,
-      email,
-      password: hashedPassword,
-    });
+    await User.create({ name, email, password: hashed });
 
-    res.status(201).json({
-      message: "User registered successfully",
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(201).json({ message: "Registered successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
-// 🔹 Login
+// LOGIN
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -38,27 +32,34 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    // ✅ FIX: use SAME key everywhere
     const token = jwt.sign(
       { userId: user._id },
-      "secretkey", // later move to .env
+      "secretkey",
       { expiresIn: "1d" }
     );
 
-    res.json({
-      message: "Login successful",
-      token,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.json({ token });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
-// 🔹 Get Current User (requires verifyToken middleware)
+// GET CURRENT USER
 exports.getMe = async (req, res) => {
-  res.json({ user: req.user });
+  try {
+    // ✅ FIX: req.user must exist from middleware
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    res.json({ user: req.user });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };

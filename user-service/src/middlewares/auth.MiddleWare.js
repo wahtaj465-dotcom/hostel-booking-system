@@ -1,22 +1,21 @@
-// user-service/src/middlewares/authMiddleWare.js
-
 const jwt = require("jsonwebtoken");
+const User = require("../models/user.model");
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) return res.status(401).json({ message: "No token" });
+
   try {
-    const authHeader = req.headers.authorization || "";
-    const token = authHeader.startsWith("Bearer ")
-      ? authHeader.split(" ")[1]
-      : null;
+    const decoded = jwt.verify(token, "secretkey");
 
-    if (!token) {
-      return res.status(401).json({ message: "No token provided" });
-    }
+    const user = await User.findById(decoded.userId).select("-password");
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret");
-    req.user = decoded;
+    req.user = user;
+    req.userId = decoded.userId;
+
     next();
-  } catch (err) {
-    return res.status(401).json({ message: "Invalid token" });
+  } catch {
+    res.status(401).json({ message: "Invalid token" });
   }
 };

@@ -2,14 +2,29 @@ const jwt = require("jsonwebtoken");
 
 exports.verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ message: "No token provided" });
 
-  const token = authHeader.split(" ")[1];
+  if (!authHeader) {
+    return res.status(401).json({ message: "Login required" });
+  }
+
+  const parts = authHeader.split(" ");
+  if (parts.length !== 2 || parts[0] !== "Bearer") {
+    return res.status(401).json({ message: "Invalid token format" });
+  }
+
+  const token = parts[1];
+
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded.id;
+    const decoded = jwt.verify(token, "secretkey");
+
+    if (!decoded.userId) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+
+    req.userId = decoded.userId;
+
     next();
-  } catch (err) {
-    return res.status(401).json({ message: "Invalid token" });
+  } catch {
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 };

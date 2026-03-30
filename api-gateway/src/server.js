@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
-const { rateLimiter } = require("./middlewares/rateLimit.middleware");
+const { verifyToken } = require("./middlewares/auth.middleware");
 
 const userRoutes = require("./routes/user.routes");
 const hostelRoutes = require("./routes/hostel.routes");
@@ -13,16 +13,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ Apply global rate limit
-app.use(rateLimiter);
-
-// ✅ Route forwarding
+// PUBLIC
 app.use("/users", userRoutes);
-app.use("/hostels", hostelRoutes);
-app.use("/bookings", bookingRoutes);
 
-const PORT = process.env.PORT || 4000;
+// PROTECTED
+app.use("/hostels", verifyToken, hostelRoutes);
+app.use("/bookings", verifyToken, bookingRoutes);
 
-app.listen(PORT, () => {
-  console.log(`API Gateway running on port ${PORT}`);
-});
+app.listen(4000, () => console.log("Gateway running on 4000"));
