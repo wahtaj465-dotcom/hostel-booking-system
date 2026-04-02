@@ -14,7 +14,8 @@ exports.bookRoom = async (req, res) => {
       return res.status(400).json({ message: "roomId is required" });
     }
 
-    const userId = req.userId;
+    // ✅ read userId forwarded from gateway
+    const userId = req.headers["x-user-id"];
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized: user not found in token" });
     }
@@ -62,8 +63,9 @@ exports.bookRoom = async (req, res) => {
 exports.cancelBooking = async (req, res) => {
   try {
     const bookingId = req.params.id;
-    const userId = req.userId;
 
+    // ✅ read userId forwarded from gateway
+    const userId = req.headers["x-user-id"];
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized: user not found in token" });
     }
@@ -111,7 +113,8 @@ exports.cancelBooking = async (req, res) => {
 // ==========================================
 exports.getMyBookings = async (req, res) => {
   try {
-    const userId = req.userId;
+    // ✅ read userId forwarded from gateway
+    const userId = req.headers["x-user-id"];
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized: user not found in token" });
     }

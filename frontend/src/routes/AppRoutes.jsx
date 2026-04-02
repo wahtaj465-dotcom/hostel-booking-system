@@ -6,13 +6,18 @@ import Hostels from "../Hostels";
 import HostelDetails from "../Hostels/Details";
 import Booking from "../Booking";
 import Dashboard from "../Dashboard";
+import AdminRooms from "../components/shared/AdminRooms";
 import Notifications from "../Notifications";
 import { useAuth } from "../context/AuthContext";
 
-const PrivateRoute = ({ children }) => {
+const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
-  const token = localStorage.getItem("token");
-  return user || token ? children : <Navigate to="/login" replace />;
+  return user ? children : <Navigate to="/login" />;
+};
+
+const AdminRoute = ({ children }) => {
+  const { user } = useAuth();
+  return user?.isAdmin ? children : <Navigate to="/" />;
 };
 
 export default function AppRoutes() {
@@ -22,34 +27,41 @@ export default function AppRoutes() {
       <Route path="/hostels" element={<Hostels />} />
       <Route path="/hostels/:id" element={<HostelDetails />} />
 
-      {/* 🔒 Booking must be logged in */}
-      <Route
-        path="/booking/:id"
-        element={
-          <PrivateRoute>
-            <Booking />
-          </PrivateRoute>
-        }
-      />
-
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
 
       <Route
+        path="/booking/:id"
+        element={
+          <ProtectedRoute>
+            <Booking />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/dashboard"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <Dashboard />
-          </PrivateRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/rooms"
+        element={
+          <AdminRoute>
+            <AdminRooms />
+          </AdminRoute>
         }
       />
 
       <Route
         path="/notifications"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <Notifications />
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       />
     </Routes>

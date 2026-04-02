@@ -1,23 +1,24 @@
-// src/middlewares/auth.middleware.js
 const jwt = require("jsonwebtoken");
 
 exports.verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ message: "No token provided" });
 
-  if (!authHeader) {
-    return res.status(401).json({ message: "No token provided" });
-  }
+  const token = authHeader.startsWith("Bearer ")
+    ? authHeader.split(" ")[1]
+    : authHeader;
 
   try {
-    const token = authHeader.split(" ")[1];
-    if (!token) return res.status(401).json({ message: "No token provided" });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const decoded = jwt.verify(token, "secretkey"); // TODO: move to process.env.JWT_SECRET!
-    if (!decoded.userId) return res.status(401).json({ message: "Invalid token" });
+    const userId =
+      decoded.userId || decoded.id || decoded._id || decoded.user?.id;
 
-    req.userId = decoded.userId;
+    if (!userId) return res.status(401).json({ message: "Invalid token" });
+
+    req.userId = userId;
     next();
-  } catch (error) {
+  } catch {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 };

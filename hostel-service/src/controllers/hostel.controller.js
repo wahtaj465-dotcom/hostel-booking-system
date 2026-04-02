@@ -110,3 +110,36 @@ exports.increaseBed = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// ✅ UPDATE ROOM
+exports.updateRoom = async (req, res) => {
+  try {
+    const room = await Room.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!room) return res.status(404).json({ message: "Room not found" });
+
+    const redis = getRedisClient();
+    await redis.del("all_rooms");
+
+    res.json(room);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ✅ DELETE ROOM
+exports.deleteRoom = async (req, res) => {
+  try {
+    const room = await Room.findByIdAndDelete(req.params.id);
+    if (!room) return res.status(404).json({ message: "Room not found" });
+
+    const redis = getRedisClient();
+    await redis.del("all_rooms");
+
+    res.json({ message: "Room deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

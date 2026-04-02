@@ -1,8 +1,15 @@
 const express = require("express");
 const axios = require("axios");
 const { HOSTEL_SERVICE_URL } = require("../config/env");
+const { verifyToken } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
+
+// ✅ Only protect write operations (POST/PATCH/DELETE)
+router.use((req, res, next) => {
+  if (req.method === "GET") return next();
+  return verifyToken(req, res, next);
+});
 
 router.use(async (req, res) => {
   try {

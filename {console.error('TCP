@@ -1,0 +1,13 @@
+[eval]:1
+require('net').connect(5672,'rabbitmq').on('connect',()= OK');process.exit(0)}).on('error',e= FAIL',e.message);process.exit(1)})ocker
+                                                      ^
+
+SyntaxError: Unexpected token ')'
+[90m    at makeContextifyScript (node:internal/vm:122:14)[39m
+[90m    at node:internal/process/execution:89:22[39m
+    at [eval]-wrapper:6:24
+[90m    at runScript (node:internal/process/execution:83:62)[39m
+[90m    at evalScript (node:internal/process/execution:114:10)[39m
+[90m    at node:internal/main/eval_string:30:3[39m
+
+Node.js v18.20.8

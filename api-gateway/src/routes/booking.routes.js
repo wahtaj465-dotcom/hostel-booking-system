@@ -10,6 +10,11 @@ router.use(async (req, res) => {
     delete headers["content-length"];
     delete headers["host"];
 
+    // ✅ forward userId to booking-service
+    if (req.userId) {
+      headers["x-user-id"] = req.userId;
+    }
+
     const response = await axios({
       method: req.method,
       url: `${BOOKING_SERVICE_URL}${req.originalUrl}`,
