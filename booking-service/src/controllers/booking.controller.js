@@ -3,6 +3,9 @@ const Booking = require("../models/booking.model");
 const { publishBookingEvent } = require("../events/producer");
 const { BOOKING_CREATED, BOOKING_CANCELLED } = require("../events/topics");
 
+// helper
+const isAdmin = (req) => req.headers["x-user-role"] === "admin";
+
 // ==========================================
 // 📌 BOOK ROOM (Concurrency Safe + Event)
 // ==========================================
@@ -113,12 +116,26 @@ exports.cancelBooking = async (req, res) => {
 // ==========================================
 exports.getMyBookings = async (req, res) => {
   try {
-    // ✅ read userId forwarded from gateway
     const userId = req.headers["x-user-id"];
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized: user not found in token" });
     }
     const bookings = await Booking.find({ userId }).sort({ createdAt: -1 });
+    return res.json(bookings);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// ==========================================
+// ✅ ADMIN: GET ALL BOOKINGS
+// ==========================================
+exports.getAllBookings = async (req, res) => {
+  try {
+    if (!isAdmin(req)) {
+      return res.status(403).json({ message: "Admin only" });
+    }
+    const bookings = await Booking.find().sort({ createdAt: -1 });
     return res.json(bookings);
   } catch (error) {
     return res.status(500).json({ message: error.message });

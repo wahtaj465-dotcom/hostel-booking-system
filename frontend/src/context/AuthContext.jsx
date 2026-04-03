@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useState } from "react";
 import api from "../services/api";
 
 const AuthContext = createContext();
-const ADMIN_EMAILS = ["admin1@example.com"];
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -14,10 +13,14 @@ export const AuthProvider = ({ children }) => {
 
     const me = await api.get("/users/me");
     const u = me.data.user;
-    setUser({
+
+    const userWithAdmin = {
       ...u,
-      isAdmin: ADMIN_EMAILS.includes(u.email),
-    });
+      isAdmin: u.role === "admin",
+    };
+
+    setUser(userWithAdmin);
+    return userWithAdmin;
   };
 
   const register = async (data) => {
@@ -32,10 +35,11 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
+
     api.get("/users/me")
       .then((res) => {
         const u = res.data.user;
-        setUser({ ...u, isAdmin: ADMIN_EMAILS.includes(u.email) });
+        setUser({ ...u, isAdmin: u.role === "admin" });
       })
       .catch(() => logout());
   }, []);

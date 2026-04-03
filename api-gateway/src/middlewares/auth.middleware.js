@@ -17,6 +17,11 @@ exports.verifyToken = (req, res, next) => {
     if (!userId) return res.status(401).json({ message: "Invalid token" });
 
     req.userId = userId;
+
+    // ✅ forward role for downstream services
+    req.userRole = decoded.role || "user";
+    req.headers["x-user-role"] = req.userRole;
+
     next();
   } catch {
     return res.status(401).json({ message: "Invalid or expired token" });

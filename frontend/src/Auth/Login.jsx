@@ -10,8 +10,14 @@ export default function Login() {
   const submit = async (e) => {
     e.preventDefault();
     try {
-      await login(form);
-      navigate("/hostels");
+      const user = await login(form);
+
+      // ✅ admin goes to dashboard that shows all bookings
+      if (user?.isAdmin) {
+        navigate("/dashboard");
+      } else {
+        navigate("/hostels");
+      }
     } catch {
       alert("Login failed");
     }
@@ -19,8 +25,17 @@ export default function Login() {
 
   return (
     <form onSubmit={submit} className="px-6 py-10 space-y-4">
-      <input className="p-2 bg-slate-700" placeholder="Email" onChange={(e)=>setForm({...form,email:e.target.value})}/>
-      <input className="p-2 bg-slate-700" type="password" placeholder="Password" onChange={(e)=>setForm({...form,password:e.target.value})}/>
+      <input
+        className="p-2 bg-slate-700"
+        placeholder="Email"
+        onChange={(e) => setForm({ ...form, email: e.target.value })}
+      />
+      <input
+        className="p-2 bg-slate-700"
+        type="password"
+        placeholder="Password"
+        onChange={(e) => setForm({ ...form, password: e.target.value })}
+      />
       <button className="bg-blue-600 px-4 py-2">Login</button>
     </form>
   );
