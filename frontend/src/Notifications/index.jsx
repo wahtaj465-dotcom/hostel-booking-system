@@ -9,17 +9,33 @@ export default function Notifications() {
   }, []);
 
   return (
-    <div className="min-h-screen px-6 py-10">
-      <h2 className="text-3xl font-bold">Notifications</h2>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">
+          Notifications
+        </h2>
+        <p className="mt-1 text-slate-600">
+          Updates about bookings and system events.
+        </p>
+      </div>
 
-      <div className="mt-6 space-y-3">
+      <div className="space-y-3">
         {notifications.map((n) => (
-          <div key={n._id} className="bg-[var(--glass)] p-4 rounded-xl border border-[var(--glass-border)]">
-            <p>{n.message}</p>
-            <small className="text-[var(--muted)]">{n.createdAt}</small>
+          <div
+            key={n._id}
+            className="rounded-3xl border border-slate-200/70 bg-white/80 p-6 shadow-[0_25px_60px_rgba(15,23,42,0.08)]"
+          >
+            <p className="text-slate-900">{n.message}</p>
+            <small className="text-slate-500">{n.createdAt}</small>
           </div>
         ))}
       </div>
+
+      {notifications.length === 0 && (
+        <div className="rounded-3xl border border-slate-200/70 bg-white/80 p-8 text-slate-600">
+          No notifications yet.
+        </div>
+      )}
     </div>
   );
 }

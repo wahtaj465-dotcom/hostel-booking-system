@@ -21,30 +21,71 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="px-6 py-10">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">
-          {user?.isAdmin ? "All Bookings (Admin)" : "My Bookings"}
-        </h2>
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">
+            {user?.isAdmin ? "All Bookings" : "My Bookings"}
+          </h2>
+          <p className="mt-1 text-slate-600">
+            {user?.isAdmin
+              ? "Admin view: monitor bookings across users."
+              : "Track your bookings and cancel if needed."}
+          </p>
+        </div>
 
         {user?.isAdmin && (
-          <Link to="/admin/rooms" className="text-blue-400">
+          <Link
+            to="/admin/rooms"
+            className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50"
+          >
             Manage Rooms
           </Link>
         )}
       </div>
 
-      {bookings.map((b) => (
-        <div key={b._id} className="p-4 bg-slate-800 rounded mt-4">
-          <p>Room ID: {b.roomId}</p>
-          <p>Status: {b.status}</p>
-          {!user?.isAdmin && (
-            <button onClick={() => cancel(b._id)} className="text-red-400">
-              Cancel
-            </button>
-          )}
+      <div className="grid gap-5 md:grid-cols-2">
+        {bookings.map((b) => (
+          <div
+            key={b._id}
+            className="rounded-3xl border border-slate-200/70 bg-white/80 p-6 shadow-[0_25px_60px_rgba(15,23,42,0.08)]"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="text-xs font-bold tracking-widest text-slate-600">
+                  BOOKING
+                </div>
+                <div className="mt-1 text-lg font-extrabold text-slate-900">
+                  Room ID: {b.roomId}
+                </div>
+                <div className="mt-2 text-sm text-slate-600">
+                  Status:{" "}
+                  <span className="font-semibold text-slate-900">{b.status}</span>
+                </div>
+              </div>
+
+              <div className="rounded-2xl bg-slate-900 px-3 py-2 text-xs font-bold text-white">
+                {user?.isAdmin ? "ADMIN" : "STUDENT"}
+              </div>
+            </div>
+
+            {!user?.isAdmin && (
+              <button
+                onClick={() => cancel(b._id)}
+                className="mt-5 rounded-2xl bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700 ring-1 ring-rose-200 hover:bg-rose-100"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {bookings.length === 0 && (
+        <div className="rounded-3xl border border-slate-200/70 bg-white/80 p-8 text-slate-600">
+          No bookings found.
         </div>
-      ))}
+      )}
     </div>
   );
 }

@@ -8,6 +8,7 @@ import Booking from "../Booking";
 import Dashboard from "../Dashboard";
 import AdminRooms from "../components/shared/AdminRooms";
 import Notifications from "../Notifications";
+import Analytics from "../Admin/Analytics";
 import { useAuth } from "../context/AuthContext";
 
 const ProtectedRoute = ({ children }) => {
@@ -52,6 +53,15 @@ export default function AppRoutes() {
         element={
           <AdminRoute>
             <AdminRooms />
+          </AdminRoute>
+        }
+      />
+
+      <Route
+        path="/admin/analytics"
+        element={
+          <AdminRoute>
+            <Analytics />
           </AdminRoute>
         }
       />

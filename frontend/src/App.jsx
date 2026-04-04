@@ -4,9 +4,11 @@ import Footer from "./components/layout/Footer";
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-screen text-slate-900">
       <Navbar />
-      <AppRoutes />
+      <main className="mx-auto max-w-6xl px-4 sm:px-6 py-10">
+        <AppRoutes />
+      </main>
       <Footer />
     </div>
   );
