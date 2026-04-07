@@ -27,34 +27,34 @@ export default function Login() {
 
   return (
     <div className="min-h-[70vh] grid place-items-center">
-      <Card className="w-full max-w-md overflow-hidden">
-        <div className="h-2 bg-gradient-to-r from-violet-600 via-fuchsia-500 to-sky-500" />
+      <Card className="w-full max-w-md overflow-hidden border-[#ff6f3d]/25">
+        <div className="h-2 bg-gradient-to-r from-[#ff6f3d] via-[#ff8a5f] to-[#ff6f3d]" />
 
         <CardHeader className="space-y-2">
-          <div className="text-xs font-bold tracking-widest text-emerald-700">
+          <div className="text-xs font-bold tracking-widest text-[#ff8a5f]">
             SECURE ACCESS
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-extrabold tracking-tight text-white">
             Welcome back
           </h1>
-          <p className="text-sm text-slate-600">
-            Login to manage bookings and continue.
+          <p className="text-sm text-slate-400">
+            Enter your credentials to access your account.
           </p>
         </CardHeader>
 
         <CardContent>
           <form onSubmit={submit} className="space-y-4">
             <div className="space-y-2">
-              <label className="text-xs text-slate-600">Email</label>
+              <label className="text-xs text-slate-400">Email</label>
               <Input
-                placeholder="you@example.com"
+                placeholder="name@example.com"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs text-slate-600">Password</label>
+              <label className="text-xs text-slate-400">Password</label>
               <Input
                 type="password"
                 placeholder="••••••••"
@@ -67,10 +67,13 @@ export default function Login() {
               {loading ? "Logging in..." : "Login"}
             </Button>
 
-            <p className="text-center text-sm text-slate-600">
+            <p className="text-center text-sm text-slate-400">
               Don’t have an account?{" "}
-              <Link to="/signup" className="font-semibold text-violet-700 hover:underline">
-                Signup
+              <Link
+                to="/signup"
+                className="font-semibold text-[#ff8a5f] hover:underline"
+              >
+                Sign up
               </Link>
             </p>
           </form>

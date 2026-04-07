@@ -1,42 +1,161 @@
 :root {
   font-family: "Inter", system-ui, Segoe UI, Roboto, sans-serif;
-  color-scheme: light;
+  color-scheme: dark;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --bg: #f8fafc;
-  --bg2: #ffffff;
-  --text: #0f172a;
-  --muted: #64748b;
-
-  --card: rgba(255, 255, 255, 0.88);
-  --card-border: rgba(15, 23, 42, 0.08);
-  --shadow: 0 25px 60px rgba(15, 23, 42, 0.12);
+  --bg: #03050c;
+  --bg2: #060914;
+  --text: #f8fafc;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
 
 body {
   margin: 0;
-  min-height: 100vh;
   color: var(--text);
   background:
-    radial-gradient(1100px 500px at 50% -5%, rgba(124, 58, 237, 0.18), transparent 60%),
-    radial-gradient(900px 450px at 0% 10%, rgba(56, 189, 248, 0.12), transparent 55%),
-    radial-gradient(900px 450px at 100% 20%, rgba(168, 85, 247, 0.10), transparent 55%),
+    radial-gradient(1200px 620px at 50% -12%, rgba(255, 111, 61, 0.17), transparent 62%),
+    radial-gradient(820px 420px at 0% 28%, rgba(255, 111, 61, 0.08), transparent 60%),
+    radial-gradient(860px 420px at 100% 24%, rgba(124, 58, 237, 0.12), transparent 62%),
+    radial-gradient(1200px 620px at 50% 120%, rgba(30, 64, 175, 0.18), transparent 62%),
     linear-gradient(180deg, var(--bg), var(--bg2));
   background-attachment: fixed;
+  overflow-x: hidden;
 }
 
-body::before {
+/* Night-sky stars */
+html::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
-  opacity: 0.06;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  z-index: -1;
+  z-index: -2;
+  opacity: 0.68;
+  background:
+    radial-gradient(circle at 12% 22%, rgba(255, 255, 255, 0.9) 1px, transparent 1.6px),
+    radial-gradient(circle at 82% 30%, rgba(255, 174, 145, 0.9) 1.1px, transparent 1.8px),
+    radial-gradient(circle at 30% 78%, rgba(255, 255, 255, 0.8) 1px, transparent 1.6px),
+    radial-gradient(circle at 68% 82%, rgba(255, 174, 145, 0.9) 1px, transparent 1.7px),
+    radial-gradient(circle at 42% 52%, rgba(255, 255, 255, 0.7) 0.9px, transparent 1.5px),
+    radial-gradient(circle at 55% 12%, rgba(255, 255, 255, 0.85) 1.1px, transparent 1.7px),
+    radial-gradient(circle at 15% 68%, rgba(255, 174, 145, 0.75) 0.9px, transparent 1.6px);
+  background-size:
+    420px 420px,
+    390px 390px,
+    470px 470px,
+    430px 430px,
+    500px 500px,
+    440px 440px,
+    460px 460px;
 }
 
-a { color: inherit; text-decoration: none; }
+/* Falling glowing fireflies - seamless (no pause) */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-repeat: repeat;
+  will-change: background-position;
+}
+
+/* Layer 1 */
+body::before {
+  opacity: 0.9;
+  background-image:
+    radial-gradient(circle, rgba(255, 111, 61, 0.95) 0 1.5px, transparent 2.6px),
+    radial-gradient(circle, rgba(255, 176, 142, 0.9) 0 1.3px, transparent 2.3px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.78) 0 1.15px, transparent 2px);
+  background-size: 220px 220px, 300px 300px, 380px 380px;
+  filter: drop-shadow(0 0 5px rgba(255, 111, 61, 0.75))
+    drop-shadow(0 0 10px rgba(255, 111, 61, 0.55));
+  animation: fireflies-fall-a 10s linear infinite;
+}
+
+/* Layer 2 (offset to avoid synchronized reset) */
+body::after {
+  opacity: 0.62;
+  background-image:
+    radial-gradient(circle, rgba(255, 111, 61, 0.8) 0 1.4px, transparent 2.4px),
+    radial-gradient(circle, rgba(255, 193, 166, 0.78) 0 1.2px, transparent 2.2px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.65) 0 1px, transparent 1.9px);
+  background-size: 260px 260px, 340px 340px, 430px 430px;
+  filter: drop-shadow(0 0 4px rgba(255, 111, 61, 0.65))
+    drop-shadow(0 0 9px rgba(255, 111, 61, 0.45));
+  animation: fireflies-fall-b 14s linear infinite;
+  animation-delay: -7s;
+}
+
+@keyframes fireflies-fall-a {
+  from {
+    background-position: 0 -220px, 0 -300px, 0 -380px;
+  }
+  to {
+    background-position: 0 220px, 0 300px, 0 380px;
+  }
+}
+
+@keyframes fireflies-fall-b {
+  from {
+    background-position: 0 -260px, 0 -340px, 0 -430px;
+  }
+  to {
+    background-position: 0 260px, 0 340px, 0 430px;
+  }
+}
+
+@keyframes gallery-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-20%);
+  }
+}
+
+/* Only used by Home hero's "Away From Home" text */
+@keyframes away-glow {
+  0%,
+  100% {
+    opacity: 0.84;
+    text-shadow: 0 0 10px rgba(255, 111, 61, 0.35), 0 0 24px rgba(255, 111, 61, 0.2);
+  }
+  50% {
+    opacity: 1;
+    text-shadow:
+      0 0 16px rgba(255, 122, 69, 0.75),
+      0 0 34px rgba(255, 111, 61, 0.6),
+      0 0 52px rgba(255, 111, 61, 0.42);
+  }
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(255, 111, 61, 0.5), rgba(255, 111, 61, 0.25));
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+}

@@ -19,7 +19,7 @@ export default function FeatureAccordionCard({
   }, [open, maxContentHeight]);
 
   return (
-    <div className="rounded-3xl border border-violet-200/70 bg-white/80 shadow-[0_18px_50px_rgba(124,58,237,0.12)] backdrop-blur transition hover:shadow-[0_22px_60px_rgba(124,58,237,0.16)]">
+    <div className="rounded-3xl border border-[#ff6f3d]/30 bg-white/[0.04] shadow-[0_0_0_1px_rgba(255,111,61,0.14),0_20px_60px_rgba(0,0,0,0.4)] backdrop-blur transition hover:border-[#ff7a45]/45 hover:shadow-[0_0_0_1px_rgba(255,111,61,0.22),0_24px_64px_rgba(255,111,61,0.18)]">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -28,23 +28,21 @@ export default function FeatureAccordionCard({
       >
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-violet-600/10 ring-1 ring-violet-500/15">
+            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-[#ff6f3d]/10 ring-1 ring-[#ff6f3d]/30">
               <span className="text-2xl">{icon}</span>
             </div>
 
             <div>
-              <div className="text-xl font-extrabold text-slate-900">
-                {title}
-              </div>
+              <div className="text-xl font-extrabold text-white">{title}</div>
               {summary ? (
-                <div className="mt-1 text-sm text-slate-600">{summary}</div>
+                <div className="mt-1 text-sm text-slate-400">{summary}</div>
               ) : null}
             </div>
           </div>
 
           <span
             className={[
-              "grid h-10 w-10 place-items-center rounded-full bg-slate-50 ring-1 ring-slate-200 transition-transform duration-200",
+              "grid h-10 w-10 place-items-center rounded-full bg-white/[0.04] ring-1 ring-white/15 transition-transform duration-200",
               open ? "rotate-180" : "rotate-0",
             ].join(" ")}
           >
@@ -53,7 +51,7 @@ export default function FeatureAccordionCard({
               height="18"
               viewBox="0 0 24 24"
               fill="none"
-              className="text-slate-600"
+              className="text-slate-300"
             >
               <path
                 d="M6 14l6-6 6 6"
@@ -72,10 +70,9 @@ export default function FeatureAccordionCard({
           className="overflow-hidden transition-[max-height,opacity,padding] duration-300 ease-out"
           style={wrapperStyle}
         >
-          {/* Only the OPEN card becomes scrollable */}
           <div
             className={[
-              "pr-2 text-base leading-7 text-slate-600",
+              "pr-2 text-base leading-7 text-slate-400",
               open ? "overflow-y-auto" : "overflow-hidden",
             ].join(" ")}
             style={open ? { maxHeight: `${maxContentHeight}px` } : undefined}

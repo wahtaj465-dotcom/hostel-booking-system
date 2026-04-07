@@ -14,7 +14,6 @@ export default function HostelDetails() {
   const token = localStorage.getItem("token");
 
   const pricing = useMemo(() => {
-    // UI-only pricing (does NOT affect backend/features)
     const monthlyRent = 450;
     const serviceFee = 25;
     return {
@@ -59,34 +58,33 @@ export default function HostelDetails() {
     await refresh();
   };
 
-  if (!room) return <div className="p-10 text-slate-600">Loading...</div>;
+  if (!room) return <div className="p-10 text-slate-400">Loading...</div>;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
-      <div className="rounded-3xl border border-slate-200/70 bg-white/80 p-7 shadow-[0_25px_60px_rgba(15,23,42,0.08)]">
-        <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">
+      <div className="rounded-3xl border border-[#ff6f3d]/25 bg-white/[0.04] p-7 shadow-[0_0_0_1px_rgba(255,111,61,0.12),0_25px_60px_rgba(0,0,0,0.45)]">
+        <h2 className="text-3xl font-extrabold tracking-tight text-white">
           {room.hostelName} — Room {room.roomNumber}
         </h2>
 
-        <p className="mt-3 text-slate-600">
-          Total Beds: <span className="font-semibold">{room.totalBeds}</span>
+        <p className="mt-3 text-slate-400">
+          Total Beds: <span className="font-semibold text-white">{room.totalBeds}</span>
         </p>
-        <p className="text-slate-600">
-          Available Beds:{" "}
-          <span className="font-semibold">{room.availableBeds}</span>
+        <p className="text-slate-400">
+          Available Beds: <span className="font-semibold text-white">{room.availableBeds}</span>
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3">
           {token ? (
             <button
               onClick={handleBook}
-              className="rounded-2xl bg-violet-600 px-5 py-3 text-sm font-semibold text-white hover:bg-violet-500"
+              className="rounded-2xl bg-[#ff6f3d] px-5 py-3 text-sm font-semibold text-white shadow-[0_0_0_1px_rgba(255,111,61,0.35),0_12px_28px_rgba(255,111,61,0.3)] hover:bg-[#ff7a45]"
             >
               Book Now
             </button>
           ) : (
             <button
-              className="rounded-2xl bg-violet-600/50 px-5 py-3 text-sm font-semibold text-white cursor-not-allowed"
+              className="cursor-not-allowed rounded-2xl bg-[#ff6f3d]/50 px-5 py-3 text-sm font-semibold text-white"
               disabled
             >
               Please log in to book
@@ -95,34 +93,34 @@ export default function HostelDetails() {
 
           <button
             onClick={handleReduce}
-            className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-50"
+            className="rounded-2xl border border-white/15 bg-white/[0.03] px-5 py-3 text-sm font-semibold text-white hover:bg-white/[0.06]"
           >
             Reduce Bed
           </button>
 
           <button
             onClick={handleIncrease}
-            className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-50"
+            className="rounded-2xl border border-white/15 bg-white/[0.03] px-5 py-3 text-sm font-semibold text-white hover:bg-white/[0.06]"
           >
             Increase Bed
           </button>
         </div>
       </div>
 
-      <div className="rounded-3xl border border-slate-200/70 bg-white/80 p-7 shadow-[0_25px_60px_rgba(15,23,42,0.08)]">
-        <h3 className="text-lg font-extrabold text-slate-900">Price Details</h3>
+      <div className="rounded-3xl border border-[#ff6f3d]/25 bg-white/[0.04] p-7 shadow-[0_0_0_1px_rgba(255,111,61,0.12),0_25px_60px_rgba(0,0,0,0.45)]">
+        <h3 className="text-lg font-extrabold text-white">Price Details</h3>
 
         <div className="mt-4 space-y-2 text-sm">
-          <div className="flex items-center justify-between text-slate-700">
+          <div className="flex items-center justify-between text-slate-300">
             <span>Monthly Rent</span>
-            <span className="font-semibold">₹{pricing.monthlyRent}</span>
+            <span className="font-semibold text-white">₹{pricing.monthlyRent}</span>
           </div>
-          <div className="flex items-center justify-between text-slate-700">
+          <div className="flex items-center justify-between text-slate-300">
             <span>Service Fee</span>
-            <span className="font-semibold">₹{pricing.serviceFee}</span>
+            <span className="font-semibold text-white">₹{pricing.serviceFee}</span>
           </div>
-          <div className="mt-3 h-px bg-slate-200" />
-          <div className="flex items-center justify-between text-slate-900">
+          <div className="mt-3 h-px bg-white/10" />
+          <div className="flex items-center justify-between text-slate-100">
             <span className="font-semibold">Total</span>
             <span className="text-base font-extrabold">₹{pricing.total}</span>
           </div>

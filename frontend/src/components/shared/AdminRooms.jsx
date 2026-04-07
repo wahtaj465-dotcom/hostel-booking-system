@@ -27,46 +27,40 @@ export default function AdminRooms() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">
-          Admin Rooms
-        </h2>
-        <p className="mt-1 text-slate-600">
-          Create rooms, manage beds, and delete rooms.
-        </p>
+        <h2 className="text-3xl font-extrabold tracking-tight text-white">Admin Rooms</h2>
+        <p className="mt-1 text-slate-400">Create rooms, manage beds, and delete rooms.</p>
       </div>
 
-      <div className="rounded-3xl border border-slate-200/70 bg-white/80 p-6 shadow-[0_25px_60px_rgba(15,23,42,0.08)]">
-        <h3 className="text-lg font-extrabold text-slate-900">Create Room</h3>
+      <div className="rounded-3xl border border-[#ff6f3d]/25 bg-white/[0.04] p-6 shadow-[0_0_0_1px_rgba(255,111,61,0.12),0_25px_60px_rgba(0,0,0,0.45)]">
+        <h3 className="text-lg font-extrabold text-white">Create Room</h3>
 
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <input
-            className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-violet-400/40"
+            className="rounded-2xl border border-white/15 bg-white/[0.03] px-4 py-3 text-sm text-white outline-none focus:border-[#ff6f3d]/60 focus:ring-2 focus:ring-[#ff6f3d]/20 placeholder:text-slate-500"
             placeholder="Hostel Name"
             onChange={(e) => setForm({ ...form, hostelName: e.target.value })}
           />
           <input
-            className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-violet-400/40"
+            className="rounded-2xl border border-white/15 bg-white/[0.03] px-4 py-3 text-sm text-white outline-none focus:border-[#ff6f3d]/60 focus:ring-2 focus:ring-[#ff6f3d]/20 placeholder:text-slate-500"
             placeholder="Room Number"
             onChange={(e) => setForm({ ...form, roomNumber: e.target.value })}
           />
           <input
-            className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-violet-400/40"
+            className="rounded-2xl border border-white/15 bg-white/[0.03] px-4 py-3 text-sm text-white outline-none focus:border-[#ff6f3d]/60 focus:ring-2 focus:ring-[#ff6f3d]/20 placeholder:text-slate-500"
             type="number"
             placeholder="Total Beds"
             onChange={(e) => setForm({ ...form, totalBeds: +e.target.value })}
           />
           <input
-            className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-violet-400/40"
+            className="rounded-2xl border border-white/15 bg-white/[0.03] px-4 py-3 text-sm text-white outline-none focus:border-[#ff6f3d]/60 focus:ring-2 focus:ring-[#ff6f3d]/20 placeholder:text-slate-500"
             type="number"
             placeholder="Available Beds"
-            onChange={(e) =>
-              setForm({ ...form, availableBeds: +e.target.value })
-            }
+            onChange={(e) => setForm({ ...form, availableBeds: +e.target.value })}
           />
         </div>
 
         <button
-          className="mt-4 rounded-2xl bg-violet-600 px-5 py-3 text-sm font-semibold text-white hover:bg-violet-500"
+          className="mt-4 rounded-2xl bg-[#ff6f3d] px-5 py-3 text-sm font-semibold text-white shadow-[0_0_0_1px_rgba(255,111,61,0.35),0_12px_28px_rgba(255,111,61,0.30)] hover:bg-[#ff7a45]"
           onClick={create}
         >
           Create
@@ -77,20 +71,19 @@ export default function AdminRooms() {
         {rooms.map((r) => (
           <div
             key={r._id}
-            className="rounded-3xl border border-slate-200/70 bg-white/80 p-6 shadow-[0_25px_60px_rgba(15,23,42,0.08)]"
+            className="rounded-3xl border border-[#ff6f3d]/25 bg-white/[0.04] p-6 shadow-[0_0_0_1px_rgba(255,111,61,0.12),0_25px_60px_rgba(0,0,0,0.45)]"
           >
-            <div className="text-lg font-extrabold text-slate-900">
+            <div className="text-lg font-extrabold text-white">
               {r.hostelName} — {r.roomNumber}
             </div>
-            <div className="mt-2 text-sm text-slate-600">
-              Total: <span className="font-semibold text-slate-900">{r.totalBeds}</span>{" "}
-              • Available:{" "}
-              <span className="font-semibold text-slate-900">{r.availableBeds}</span>
+            <div className="mt-2 text-sm text-slate-400">
+              Total: <span className="font-semibold text-white">{r.totalBeds}</span> • Available:{" "}
+              <span className="font-semibold text-white">{r.availableBeds}</span>
             </div>
 
             <button
               onClick={() => remove(r._id)}
-              className="mt-4 rounded-2xl bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700 ring-1 ring-rose-200 hover:bg-rose-100"
+              className="mt-4 rounded-2xl bg-rose-500/10 px-4 py-2 text-sm font-semibold text-rose-200 ring-1 ring-rose-400/30 hover:bg-rose-500/20"
             >
               Delete
             </button>

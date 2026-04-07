@@ -2,7 +2,8 @@ export function Card({ className = "", ...props }) {
   return (
     <div
       className={[
-        "rounded-3xl border border-slate-200/70 bg-white/80 shadow-[0_25px_60px_rgba(15,23,42,0.12)] backdrop-blur",
+        "rounded-3xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]",
+        "shadow-[0_0_0_1px_rgba(255,122,69,0.2),0_26px_60px_rgba(0,0,0,0.45)] backdrop-blur",
         className,
       ].join(" ")}
       {...props}

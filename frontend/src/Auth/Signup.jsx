@@ -26,43 +26,43 @@ export default function Signup() {
 
   return (
     <div className="min-h-[70vh] grid place-items-center">
-      <Card className="w-full max-w-md overflow-hidden">
-        <div className="h-2 bg-gradient-to-r from-sky-500 via-violet-600 to-fuchsia-500" />
+      <Card className="w-full max-w-md overflow-hidden border-[#ff6f3d]/25">
+        <div className="h-2 bg-gradient-to-r from-[#ff6f3d] via-[#ff8a5f] to-[#ff6f3d]" />
 
         <CardHeader className="space-y-2">
-          <div className="text-xs font-bold tracking-widest text-slate-700">
+          <div className="text-xs font-bold tracking-widest text-slate-300">
             CREATE ACCOUNT
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
-            Get started
+          <h1 className="text-2xl font-extrabold tracking-tight text-white">
+            Create an account
           </h1>
-          <p className="text-sm text-slate-600">
-            Create your account and book your room.
+          <p className="text-sm text-slate-400">
+            Join our community and find your perfect stay.
           </p>
         </CardHeader>
 
         <CardContent>
           <form onSubmit={submit} className="space-y-4">
             <div className="space-y-2">
-              <label className="text-xs text-slate-600">Name</label>
+              <label className="text-xs text-slate-400">Full Name</label>
               <Input
-                placeholder="Your name"
+                placeholder="John Doe"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs text-slate-600">Email</label>
+              <label className="text-xs text-slate-400">Email</label>
               <Input
-                placeholder="you@example.com"
+                placeholder="name@example.com"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs text-slate-600">Password</label>
+              <label className="text-xs text-slate-400">Password</label>
               <Input
                 type="password"
                 placeholder="••••••••"
@@ -72,12 +72,15 @@ export default function Signup() {
             </div>
 
             <Button className="w-full" type="submit" disabled={loading}>
-              {loading ? "Creating..." : "Signup"}
+              {loading ? "Creating..." : "Sign up"}
             </Button>
 
-            <p className="text-center text-sm text-slate-600">
+            <p className="text-center text-sm text-slate-400">
               Already have an account?{" "}
-              <Link to="/login" className="font-semibold text-violet-700 hover:underline">
+              <Link
+                to="/login"
+                className="font-semibold text-[#ff8a5f] hover:underline"
+              >
                 Login
               </Link>
             </p>

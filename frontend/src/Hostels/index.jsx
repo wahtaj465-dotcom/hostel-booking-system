@@ -13,16 +13,17 @@ export default function Hostels() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">
-            Explore Hostels
+          <h2 className="text-3xl font-extrabold tracking-tight text-white">
+            Find Your Space
           </h2>
-          <p className="mt-1 text-slate-600">
-            Choose a room based on availability and book instantly.
+          <p className="mt-1 text-slate-400">
+            Browse through our curated list of premium student accommodations.
           </p>
         </div>
 
-        <div className="rounded-2xl border border-slate-200/70 bg-white/70 px-4 py-2 text-sm text-slate-600 shadow-sm backdrop-blur">
-          Total Rooms: <span className="font-semibold text-slate-900">{rooms.length}</span>
+        <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-slate-300 shadow-sm backdrop-blur">
+          Total Rooms:{" "}
+          <span className="font-semibold text-white">{rooms.length}</span>
         </div>
       </div>
 
@@ -33,33 +34,33 @@ export default function Hostels() {
           return (
             <div
               key={r._id}
-              className="group rounded-3xl border border-slate-200/70 bg-white/80 p-6 shadow-[0_25px_60px_rgba(15,23,42,0.08)] backdrop-blur transition hover:-translate-y-0.5 hover:shadow-[0_30px_70px_rgba(15,23,42,0.12)]"
+              className="group rounded-3xl border border-[#ff6f3d]/25 bg-white/[0.04] p-6 shadow-[0_0_0_1px_rgba(255,111,61,0.12),0_20px_60px_rgba(0,0,0,0.45)] backdrop-blur transition hover:-translate-y-0.5 hover:border-[#ff7a45]/40 hover:shadow-[0_0_0_1px_rgba(255,111,61,0.2),0_26px_70px_rgba(255,111,61,0.16)]"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <h3 className="truncate text-lg font-extrabold text-slate-900">
-                    {r.hostelName} <span className="text-slate-400">•</span> Room{" "}
-                    {r.roomNumber}
+                  <h3 className="truncate text-lg font-extrabold text-white">
+                    {r.hostelName} <span className="text-slate-600">•</span>{" "}
+                    Room {r.roomNumber}
                   </h3>
 
                   <div className="mt-3 grid grid-cols-2 gap-3">
-                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
                       <div className="text-xs font-semibold text-slate-500">
                         Total Beds
                       </div>
-                      <div className="mt-1 text-base font-extrabold text-slate-900">
+                      <div className="mt-1 text-base font-extrabold text-white">
                         {r.totalBeds}
                       </div>
                     </div>
 
-                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
                       <div className="text-xs font-semibold text-slate-500">
                         Available
                       </div>
                       <div
                         className={[
                           "mt-1 text-base font-extrabold",
-                          isAvailable ? "text-emerald-700" : "text-rose-700",
+                          isAvailable ? "text-emerald-400" : "text-rose-400",
                         ].join(" ")}
                       >
                         {r.availableBeds}
@@ -72,8 +73,8 @@ export default function Hostels() {
                   className={[
                     "shrink-0 rounded-2xl px-3 py-2 text-xs font-extrabold tracking-wide ring-1",
                     isAvailable
-                      ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
-                      : "bg-rose-50 text-rose-700 ring-rose-200",
+                      ? "bg-emerald-500/10 text-emerald-300 ring-emerald-500/30"
+                      : "bg-rose-500/10 text-rose-300 ring-rose-500/30",
                   ].join(" ")}
                 >
                   {isAvailable ? "AVAILABLE" : "FULL"}
@@ -83,7 +84,7 @@ export default function Hostels() {
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link
                   to={`/hostels/${r._id}`}
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50"
+                  className="rounded-2xl border border-white/15 bg-white/[0.03] px-4 py-2 text-sm font-semibold text-white hover:bg-white/[0.06]"
                 >
                   View Details
                 </Link>
@@ -91,10 +92,10 @@ export default function Hostels() {
                 <Link
                   to={`/booking/${r._id}`}
                   className={[
-                    "rounded-2xl px-4 py-2 text-sm font-semibold text-white shadow-sm",
+                    "rounded-2xl px-4 py-2 text-sm font-semibold text-white",
                     isAvailable
-                      ? "bg-violet-600 hover:bg-violet-500"
-                      : "bg-slate-300 cursor-not-allowed pointer-events-none",
+                      ? "bg-[#ff6f3d] shadow-[0_0_0_1px_rgba(255,111,61,0.35),0_12px_30px_rgba(255,111,61,0.3)] hover:bg-[#ff7a45]"
+                      : "bg-slate-700 cursor-not-allowed pointer-events-none",
                   ].join(" ")}
                   aria-disabled={!isAvailable}
                 >
