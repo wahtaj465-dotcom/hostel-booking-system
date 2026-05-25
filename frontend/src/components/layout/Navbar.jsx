@@ -38,9 +38,11 @@ export default function Navbar() {
         </Link>
 
         <nav className="flex items-center gap-5 text-sm font-semibold text-slate-300">
-          <Link to="/hostels" className="hover:text-white">
-            Explore
-          </Link>
+          {!user?.isAdmin && (
+  <Link to="/hostels" className="hover:text-white">
+    Explore
+  </Link>
+)}
 
           {user ? (
             <>

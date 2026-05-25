@@ -82,6 +82,7 @@ services:
       MONGO_URI: mongodb://mongo:27017/booking-service-db
       RABBITMQ_URL: amqp://rabbitmq:5672
       HOSTEL_SERVICE_URL: http://hostel-service:4002
+      
     depends_on:
       mongo:
         condition: service_healthy

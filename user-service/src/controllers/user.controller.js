@@ -88,3 +88,18 @@ exports.getMe = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// ✅ INTERNAL: GET USER EMAIL BY ID (for notification-service)
+// In a real production setup, protect this endpoint with a service token.
+exports.getUserEmailInternal = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    const user = await User.findById(userId).select("email name");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    return res.json({ email: user.email, name: user.name });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};

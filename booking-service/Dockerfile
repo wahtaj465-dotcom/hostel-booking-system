@@ -10,3 +10,4 @@ COPY . .
 EXPOSE 4003
 
 CMD ["node", "src/app.js"]
+

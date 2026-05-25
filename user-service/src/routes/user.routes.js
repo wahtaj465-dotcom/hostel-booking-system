@@ -9,4 +9,6 @@ router.post("/register", userController.register);
 router.post("/login", userController.login);
 router.get("/me", verifyToken, userController.getMe); // VERIFYTOKEN HERE
 
+router.get("/internal/:id", userController.getUserEmailInternal);
+
 module.exports = router;
