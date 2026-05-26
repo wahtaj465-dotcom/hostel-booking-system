@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
 const { getUserEmailById } = require("./user.service");
+const { buildEmailContent } = require("../utils/booking-email-content.util");
 
 let transporter;
 
@@ -24,38 +25,6 @@ function getTransporter() {
   });
 
   return transporter;
-}
-
-function buildEmailContent(event) {
-  const type = event.type;
-  const bookingId = event.bookingId;
-  const roomId = event.roomId;
-
-  if (type === "BOOKING_CREATED") {
-    return {
-      subject: `Booking Confirmed (Booking ID: ${bookingId})`,
-      text: `Your booking is confirmed.\nBooking ID: ${bookingId}\nRoom ID: ${roomId}\n`,
-      html: `<h2>Booking Confirmed</h2>
-             <p><b>Booking ID:</b> ${bookingId}</p>
-             <p><b>Room ID:</b> ${roomId}</p>`,
-    };
-  }
-
-  if (type === "BOOKING_CANCELLED") {
-    return {
-      subject: `Booking Cancelled (Booking ID: ${bookingId})`,
-      text: `Your booking has been cancelled.\nBooking ID: ${bookingId}\nRoom ID: ${roomId}\n`,
-      html: `<h2>Booking Cancelled</h2>
-             <p><b>Booking ID:</b> ${bookingId}</p>
-             <p><b>Room ID:</b> ${roomId}</p>`,
-    };
-  }
-
-  return {
-    subject: `Booking Update`,
-    text: `Booking event received.`,
-    html: `<p>Booking event received.</p>`,
-  };
 }
 
 const sendEmail = async (bookingData) => {
