@@ -10,8 +10,10 @@ const ADMIN_PASSWORD = "admin123";
 exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    const normalizedEmail =
-      typeof email === "string" ? email.trim().toLowerCase() : email;
+    if (typeof email !== "string") {
+      return res.status(400).json({ message: "Please provide a valid email address." });
+    }
+    const normalizedEmail = email.trim().toLowerCase();
 
     // ✅ block admin signup to keep credentials fixed
     if (normalizedEmail === ADMIN_EMAIL) {
@@ -34,8 +36,10 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const normalizedEmail =
-      typeof email === "string" ? email.trim().toLowerCase() : email;
+    if (typeof email !== "string") {
+      return res.status(400).json({ message: "Please provide a valid email address." });
+    }
+    const normalizedEmail = email.trim().toLowerCase();
 
     // ✅ hardcoded admin login
     if (normalizedEmail === ADMIN_EMAIL) {
