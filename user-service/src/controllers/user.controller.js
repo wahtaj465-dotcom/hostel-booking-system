@@ -10,17 +10,19 @@ const ADMIN_PASSWORD = "admin123";
 exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    const normalizedEmail =
+      typeof email === "string" ? email.trim().toLowerCase() : email;
 
     // ✅ block admin signup to keep credentials fixed
-    if (email === ADMIN_EMAIL) {
+    if (normalizedEmail === ADMIN_EMAIL) {
       return res.status(403).json({ message: "Admin registration not allowed" });
     }
 
-    const exists = await User.findOne({ email });
+    const exists = await User.findOne({ email: normalizedEmail });
     if (exists) return res.status(400).json({ message: "User exists" });
 
     const hashed = await bcrypt.hash(password, 10);
-    await User.create({ name, email, password: hashed });
+    await User.create({ name, email: normalizedEmail, password: hashed });
 
     res.status(201).json({ message: "Registered successfully" });
   } catch (err) {
@@ -32,9 +34,11 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const normalizedEmail =
+      typeof email === "string" ? email.trim().toLowerCase() : email;
 
     // ✅ hardcoded admin login
-    if (email === ADMIN_EMAIL) {
+    if (normalizedEmail === ADMIN_EMAIL) {
       if (password !== ADMIN_PASSWORD) {
         return res.status(400).json({ message: "Invalid credentials" });
       }
@@ -61,7 +65,7 @@ exports.login = async (req, res) => {
     }
 
     // normal user login
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
     const match = await bcrypt.compare(password, user.password);
