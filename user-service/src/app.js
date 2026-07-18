@@ -2,9 +2,11 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
+const { connectRabbitMQ } = require("./events/producer");
 
 dotenv.config();
 connectDB();
+connectRabbitMQ();
 
 const app = express();
 

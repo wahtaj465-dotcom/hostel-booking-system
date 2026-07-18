@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const { connectRabbitMQ } = require("./config/rabbitmq");
 const { startBookingConsumer } = require("./consumers/booking.consumers");
+const { startAuthConsumer } = require("./consumers/auth.consumer");
 const notificationRoutes = require("./routes/notification.routes");
 
 const app = express();
@@ -26,6 +27,7 @@ const startServer = async () => {
   // ✅ Then start RabbitMQ consumer
   await connectRabbitMQ();
   await startBookingConsumer();
+  await startAuthConsumer();
 
   app.listen(PORT, () => {
     console.log(`🚀 Notification Service running on port ${PORT}`);

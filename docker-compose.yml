@@ -48,9 +48,13 @@ services:
     environment:
       PORT: 4001
       MONGO_URI: mongodb://mongo:27017/user-service-db
+      RABBITMQ_URL: amqp://rabbitmq:5672
     depends_on:
       mongo:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
 
   hostel-service:
     build: ./hostel-service
