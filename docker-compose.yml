@@ -1,7 +1,6 @@
-version: '3.8'
+version: "3.8"
 
 services:
-
   mongo:
     image: mongo:6
     container_name: mongo
@@ -9,6 +8,12 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -16,44 +21,119 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
-
-  user-service:
-    build: ./user-service
-    ports:
-      - "4001:4001"
-    depends_on:
-      - mongo
-
-  hostel-service:
-    build: ./hostel-service
-    ports:
-      - "4002:4002"
-    depends_on:
-      - mongo
-
-  booking-service:
-    build: ./booking-service
-    ports:
-      - "4003:4003"
-    depends_on:
-      - mongo
-      - rabbitmq
-
-  notification-service:
-    build: ./notification-service
-    ports:
-      - "4004:4004"
-    depends_on:
-      - rabbitmq
-
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
   redis:
     image: redis:7
     container_name: redis
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  user-service:
+    build: ./user-service
+    ports:
+      - "4001:4001"
+    env_file:
+      - ./user-service/.env
+    environment:
+      PORT: 4001
+      MONGO_URI: mongodb://mongo:27017/user-service-db
+      RABBITMQ_URL: amqp://rabbitmq:5672
+    depends_on:
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
+  hostel-service:
+    build: ./hostel-service
+    ports:
+      - "4002:4002"
+    env_file:
+      - ./hostel-service/.env
+    environment:
+      PORT: 4002
+      MONGO_URI: mongodb://mongo:27017/hostel-service-db
+      RABBITMQ_URL: amqp://rabbitmq:5672
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  booking-service:
+    build: ./booking-service
+    ports:
+      - "4003:4003"
+    env_file:
+      - ./booking-service/.env
+    environment:
+      PORT: 4003
+      MONGO_URI: mongodb://mongo:27017/booking-service-db
+      RABBITMQ_URL: amqp://rabbitmq:5672
+      HOSTEL_SERVICE_URL: http://hostel-service:4002
+      USER_SERVICE_URL: http://user-service:4001
+    depends_on:
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  notification-service:
+    build: ./notification-service
+    ports:
+      - "4004:4004"
+    env_file:
+      - ./notification-service/.env
+    environment:
+      PORT: 4004
+      MONGO_URI: mongodb://mongo:27017/notification-service-db
+      RABBITMQ_URL: amqp://rabbitmq:5672
+    depends_on:
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:alpine
+    container_name: hostel_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api-gateway
+
+  api-gateway:
+    build: ./api-gateway
+    expose:
+      - "4000"
+    env_file:
+      - ./api-gateway/.env
+    environment:
+      USER_SERVICE_URL: http://user-service:4001
+      HOSTEL_SERVICE_URL: http://hostel-service:4002
+      BOOKING_SERVICE_URL: http://booking-service:4003
+      NOTIFICATION_SERVICE_URL: http://notification-service:4004
+    depends_on:
+      - user-service
+      - hostel-service
+      - booking-service
+      - notification-service
 
 volumes:
   mongo-data:

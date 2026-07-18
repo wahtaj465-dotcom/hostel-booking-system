@@ -1,7 +1,11 @@
 const axios = require("axios");
 const Booking = require("../models/booking.model");
 const { publishBookingEvent } = require("../events/producer");
-const { BOOKING_CREATED } = require("../events/topics");
+const { BOOKING_CREATED, BOOKING_CANCELLED } = require("../events/topics");
+const { getEnrichedBookingDetails } = require("../services/booking-details.service");
+
+// helper
+const isAdmin = (req) => req.headers["x-user-role"] === "admin";
 
 // ==========================================
 // 📌 BOOK ROOM (Concurrency Safe + Event)
@@ -11,12 +15,14 @@ exports.bookRoom = async (req, res) => {
     const { roomId } = req.body;
 
     if (!roomId) {
-      return res.status(400).json({
-        message: "roomId is required",
-      });
+      return res.status(400).json({ message: "roomId is required" });
     }
 
-    const userId = req.userId;
+    // ✅ read userId forwarded from gateway
+    const userId = req.headers["x-user-id"];
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: user not found in token" });
+    }
 
     // 1️⃣ Atomic bed reduction via Hostel Service
     const response = await axios.patch(
@@ -24,9 +30,7 @@ exports.bookRoom = async (req, res) => {
     );
 
     if (!response || response.status !== 200) {
-      return res.status(400).json({
-        message: "Room not available",
-      });
+      return res.status(400).json({ message: "Room not available" });
     }
 
     // 2️⃣ Save booking in DB
@@ -36,25 +40,34 @@ exports.bookRoom = async (req, res) => {
       status: "CONFIRMED",
     });
 
+    const { details, userEmail } = await getEnrichedBookingDetails(booking);
+    console.log("📘 Booking details prepared:", details);
+
     // 3️⃣ Publish booking created event
     await publishBookingEvent({
       type: BOOKING_CREATED,
-      bookingId: booking._id,
+      bookingId: details.bookingId || booking._id,
       userId,
-      roomId,
+      roomId: details.roomId || roomId,
+      userEmail,
+      roomType: details.roomType,
+      price: details.price,
+      bookerName: details.bookerName,
+      checkInDate: details.checkInDate,
+      checkOutDate: details.checkOutDate,
+      guests: details.guests,
     });
 
     return res.status(201).json({
       message: "Room booked successfully",
       booking,
+      bookingDetails: details,
     });
-
   } catch (error) {
     console.error("Booking Error:", error.message);
 
     return res.status(400).json({
-      message:
-        error.response?.data?.message || "Booking failed",
+      message: error.response?.data?.message || "Booking failed",
     });
   }
 };
@@ -65,7 +78,12 @@ exports.bookRoom = async (req, res) => {
 exports.cancelBooking = async (req, res) => {
   try {
     const bookingId = req.params.id;
-    const userId = req.userId;
+
+    // ✅ read userId forwarded from gateway
+    const userId = req.headers["x-user-id"];
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: user not found in token" });
+    }
 
     // 1️⃣ Find confirmed booking
     const booking = await Booking.findOne({
@@ -84,24 +102,65 @@ exports.cancelBooking = async (req, res) => {
     booking.status = "CANCELLED";
     await booking.save();
 
+    const { details, userEmail } = await getEnrichedBookingDetails(booking);
+    console.log("📘 Cancellation details prepared:", details);
+
     // 3️⃣ Publish cancellation event
     await publishBookingEvent({
-      type: "BOOKING_CANCELLED",
-      bookingId: booking._id,
+      type: BOOKING_CANCELLED,
+      bookingId: details.bookingId || booking._id,
       userId,
-      roomId: booking.roomId,
+      roomId: details.roomId || booking.roomId,
+      userEmail,
+      roomType: details.roomType,
+      price: details.price,
+      bookerName: details.bookerName,
+      checkInDate: details.checkInDate,
+      checkOutDate: details.checkOutDate,
+      guests: details.guests,
     });
 
     return res.status(200).json({
       message: "Booking cancelled successfully",
       booking,
+      bookingDetails: details,
     });
-
   } catch (error) {
     console.error("Cancel Error:", error.message);
 
     return res.status(400).json({
       message: "Cancellation failed",
     });
+  }
+};
+
+// ==========================================
+// ✅ GET MY BOOKINGS
+// ==========================================
+exports.getMyBookings = async (req, res) => {
+  try {
+    const userId = req.headers["x-user-id"];
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: user not found in token" });
+    }
+    const bookings = await Booking.find({ userId }).sort({ createdAt: -1 });
+    return res.json(bookings);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// ==========================================
+// ✅ ADMIN: GET ALL BOOKINGS
+// ==========================================
+exports.getAllBookings = async (req, res) => {
+  try {
+    if (!isAdmin(req)) {
+      return res.status(403).json({ message: "Admin only" });
+    }
+    const bookings = await Booking.find().sort({ createdAt: -1 });
+    return res.json(bookings);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
 };

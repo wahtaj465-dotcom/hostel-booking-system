@@ -1,9 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const bookingController = require("../controllers/booking.controller");
-const { verifyToken } = require("../middlewares/auth.middleware");
+// ❗ NO AUTH HERE (handled by gateway)
 
-router.post("/book-room", verifyToken, bookingController.bookRoom);
-router.delete("/:id", verifyToken, bookingController.cancelBooking);
+const requireAdmin = (req, res, next) => {
+  if (req.headers["x-user-role"] !== "admin") {
+    return res.status(403).json({ message: "Admin only" });
+  }
+  next();
+};
+
+router.post("/book-room", bookingController.bookRoom);
+router.get("/my-bookings", bookingController.getMyBookings);
+router.get("/all", requireAdmin, bookingController.getAllBookings);
+router.delete("/:id", bookingController.cancelBooking);
 
 module.exports = router;

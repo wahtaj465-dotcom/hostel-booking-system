@@ -3,8 +3,8 @@
  * This prevents hardcoding strings across the application.
  */
 
-const QUEUES = {
-  BOOKING_QUEUE: "booking_queue",
+const EXCHANGES = {
+  BOOKING_EXCHANGE: "booking_events",
 };
 
 const EVENTS = {
@@ -13,6 +13,6 @@ const EVENTS = {
 };
 
 module.exports = {
-  ...QUEUES,
+  ...EXCHANGES,
   ...EVENTS,
 };

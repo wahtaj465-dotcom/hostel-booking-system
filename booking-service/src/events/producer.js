@@ -1,20 +1,17 @@
 const amqp = require("amqplib");
-const { BOOKING_QUEUE } = require("./topics");
+
+const EXCHANGE_NAME = "booking_events";
 
 let channel;
 
 async function connectRabbitMQ() {
   try {
     console.log("🔄 Booking Service connecting to RabbitMQ...");
-
-    // 🔥 IMPORTANT FIX HERE
     const connection = await amqp.connect(process.env.RABBITMQ_URL);
-
     channel = await connection.createChannel();
 
-    await channel.assertQueue(BOOKING_QUEUE, {
-      durable: true,
-    });
+    // Declare a fanout exchange instead of a queue
+    await channel.assertExchange(EXCHANGE_NAME, "fanout", { durable: true });
 
     console.log("✅ Booking Service connected to RabbitMQ");
   } catch (error) {
@@ -29,13 +26,15 @@ async function publishBookingEvent(data) {
     return;
   }
 
-  channel.sendToQueue(
-    BOOKING_QUEUE,
+  // Publish to exchange (fanout ignores routing key, so empty string)
+  channel.publish(
+    EXCHANGE_NAME,
+    "",
     Buffer.from(JSON.stringify(data)),
     { persistent: true }
   );
 
-  console.log("📤 Booking event published");
+  console.log("📤 Booking event published to exchange");
 }
 
 module.exports = {
