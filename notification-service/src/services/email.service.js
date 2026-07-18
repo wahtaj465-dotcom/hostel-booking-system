@@ -1,6 +1,7 @@
 const nodemailer = require("nodemailer");
 const { getUserEmailById } = require("./user.service");
 const { buildEmailContent } = require("../utils/booking-email-content.util");
+const { buildOtpEmailContent } = require("../utils/otp-email-content.util");
 
 let transporter;
 
@@ -27,10 +28,37 @@ function getTransporter() {
   return transporter;
 }
 
+const sendEmailMessage = async ({ toEmail, subject, text, html, eventData }) => {
+  if (process.env.MAIL_ENABLED === "false") return;
+
+  if (!toEmail) {
+    console.log("No recipient email found for event. Skipping email.", eventData);
+    return;
+  }
+
+  const tx = getTransporter();
+  if (!tx) return;
+
+  const fromName = process.env.MAIL_FROM_NAME || "Hostel Booking System";
+  const fromEmail = process.env.MAIL_FROM_EMAIL;
+  if (!fromEmail) {
+    console.log("MAIL_FROM_EMAIL missing in env.");
+    return;
+  }
+
+  const info = await tx.sendMail({
+    from: `"${fromName}" <${fromEmail}>`,
+    to: toEmail,
+    subject,
+    text,
+    html,
+  });
+
+  console.log("✅ Email sent:", info.messageId, "to:", toEmail);
+};
+
 const sendEmail = async (bookingData) => {
   try {
-    if (process.env.MAIL_ENABLED === "false") return;
-
     // Determine recipient:
     // Prefer explicit userEmail if event includes it, otherwise fetch from user-service.
     let toEmail = bookingData.userEmail || null;
@@ -39,35 +67,28 @@ const sendEmail = async (bookingData) => {
       toEmail = await getUserEmailById(bookingData.userId);
     }
 
-    if (!toEmail) {
-      console.log("No recipient email found for event. Skipping email.", bookingData);
-      return;
-    }
-
-    const tx = getTransporter();
-    if (!tx) return;
-
-    const fromName = process.env.MAIL_FROM_NAME || "Hostel Booking System";
-    const fromEmail = process.env.MAIL_FROM_EMAIL;
-    if (!fromEmail) {
-      console.log("MAIL_FROM_EMAIL missing in env.");
-      return;
-    }
-
     const { subject, text, html } = buildEmailContent(bookingData);
 
-    const info = await tx.sendMail({
-      from: `"${fromName}" <${fromEmail}>`,
-      to: toEmail,
-      subject,
-      text,
-      html,
-    });
-
-    console.log("✅ Email sent:", info.messageId, "to:", toEmail);
+    await sendEmailMessage({ toEmail, subject, text, html, eventData: bookingData });
   } catch (err) {
     console.error("❌ Email send failed:", err.message);
   }
 };
 
-module.exports = { sendEmail };
+const sendOtpEmail = async (authData) => {
+  try {
+    const { subject, text, html } = buildOtpEmailContent(authData);
+
+    await sendEmailMessage({
+      toEmail: authData.userEmail,
+      subject,
+      text,
+      html,
+      eventData: authData,
+    });
+  } catch (err) {
+    console.error("❌ OTP email send failed:", err.message);
+  }
+};
+
+module.exports = { sendEmail, sendOtpEmail };

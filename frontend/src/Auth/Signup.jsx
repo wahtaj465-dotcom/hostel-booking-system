@@ -6,19 +6,35 @@ import Input from "../components/ui/Input";
 import { Card, CardHeader, CardContent } from "../components/ui/Card";
 
 export default function Signup() {
-  const { register } = useAuth();
+  const { requestSignupOtp, verifyOtp } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", otp: "" });
+  const [otpRequested, setOtpRequested] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const submit = async (e) => {
+  const requestOtp = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await register(form);
-      navigate("/login");
+      await requestSignupOtp({ name: form.name, email: form.email, password: form.password });
+      setOtpRequested(true);
+      alert("Signup OTP sent to your email");
     } catch {
       alert("Signup failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const submitOtp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const user = await verifyOtp({ email: form.email, otp: form.otp, purpose: "signup" });
+      if (user?.isAdmin) navigate("/dashboard");
+      else navigate("/hostels");
+    } catch {
+      alert("OTP verification failed");
     } finally {
       setLoading(false);
     }
@@ -37,17 +53,18 @@ export default function Signup() {
             Create an account
           </h1>
           <p className="text-sm text-slate-400">
-            Join our community and find your perfect stay.
+            Verify your email with an OTP to activate your account.
           </p>
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={submit} className="space-y-4">
+          <form onSubmit={otpRequested ? submitOtp : requestOtp} className="space-y-4">
             <div className="space-y-2">
               <label className="text-xs text-slate-400">Full Name</label>
               <Input
                 placeholder="John Doe"
                 value={form.name}
+                disabled={otpRequested}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
             </div>
@@ -57,6 +74,7 @@ export default function Signup() {
               <Input
                 placeholder="name@example.com"
                 value={form.email}
+                disabled={otpRequested}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
               />
             </div>
@@ -67,13 +85,38 @@ export default function Signup() {
                 type="password"
                 placeholder="••••••••"
                 value={form.password}
+                disabled={otpRequested}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
               />
             </div>
 
+            {otpRequested && (
+              <div className="space-y-2">
+                <label className="text-xs text-slate-400">OTP</label>
+                <Input
+                  inputMode="numeric"
+                  maxLength="6"
+                  placeholder="123456"
+                  value={form.otp}
+                  onChange={(e) => setForm({ ...form, otp: e.target.value })}
+                />
+              </div>
+            )}
+
             <Button className="w-full" type="submit" disabled={loading}>
-              {loading ? "Creating..." : "Sign up"}
+              {loading ? "Please wait..." : otpRequested ? "Verify OTP" : "Send Signup OTP"}
             </Button>
+
+            {otpRequested && (
+              <button
+                type="button"
+                className="w-full text-sm font-semibold text-[#ff8a5f] hover:underline"
+                onClick={requestOtp}
+                disabled={loading}
+              >
+                Resend OTP
+              </button>
+            )}
 
             <p className="text-center text-sm text-slate-400">
               Already have an account?{" "}
