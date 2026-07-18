@@ -55,7 +55,6 @@ services:
       rabbitmq:
         condition: service_healthy
 
-
   hostel-service:
     build: ./hostel-service
     ports:
@@ -87,7 +86,6 @@ services:
       RABBITMQ_URL: amqp://rabbitmq:5672
       HOSTEL_SERVICE_URL: http://hostel-service:4002
       USER_SERVICE_URL: http://user-service:4001
-      
     depends_on:
       mongo:
         condition: service_healthy
@@ -110,10 +108,20 @@ services:
       rabbitmq:
         condition: service_healthy
 
+  nginx:
+    image: nginx:alpine
+    container_name: hostel_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api-gateway
+
   api-gateway:
     build: ./api-gateway
-    ports:
-      - "4000:4000"
+    expose:
+      - "4000"
     env_file:
       - ./api-gateway/.env
     environment:
